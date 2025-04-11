@@ -2,6 +2,8 @@ package com.duarte.bank_account.domain.model;
 
 import jakarta.persistence.*;
 
+import java.time.OffsetDateTime;
+
 @Entity
 @Table(name = "accounts")
 public class Account {
@@ -13,6 +15,8 @@ public class Account {
     private String fullName;
 
     private String email;
+
+    private OffsetDateTime creation;
 
 }
 

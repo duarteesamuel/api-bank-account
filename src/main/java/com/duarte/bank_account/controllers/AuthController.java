@@ -5,6 +5,7 @@ import com.duarte.bank_account.domain.dto.AccountResponseDTO;
 import com.duarte.bank_account.domain.model.Account;
 import com.duarte.bank_account.repositories.AccountRepository;
 import com.duarte.bank_account.services.AccountService;
+import com.duarte.bank_account.services.AuthService;
 import com.duarte.bank_account.services.TokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,35 +25,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AccountRepository accountRepository;
-    private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
-    private final AccountService accountService;
+    private final AuthService authService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid AccountRequestDTO body){
-        Optional<Account> account = this.accountRepository.findByEmail(body.email());
-
-        if(account.isEmpty()){
-            Account newAccount = Account.builder()
-                    .fullName(body.fullName())
-                    .creationDate(accountService.generateCreationDate())
-                    .accountNumber(accountService.generateAccountNumber())
-                    .email(body.email())
-                    .password(body.password())
-                    .balance(BigDecimal.ZERO)
-                    .build();
-
-            String token = this.tokenService.generateToken(newAccount);
-
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new AccountResponseDTO(newAccount.getFullName(),
-                            newAccount.getEmail(),
-                            newAccount.getCreationDate(),
-                            newAccount.getAccountNumber(),
-                            newAccount.getBalance(),
-                            token));
+        try{
+            AccountResponseDTO response = authService.register(body);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
+
 }

@@ -43,7 +43,7 @@ public class Account {
 
     @NotBlank(message = "The password cannot be empty.")
     @Column(nullable = false)
-    @Size(min = 8, max = 16, message = "The password must have between 8 and 16 characteres.")
+    @Size(min = 8, max = 100, message = "The password must have between 8 and 16 characteres.")
     private String password;
 
     @Column(nullable = false)

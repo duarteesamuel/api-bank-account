@@ -1,7 +1,9 @@
 package com.duarte.bank_account.services;
 
 import com.duarte.bank_account.domain.model.Account;
+import com.duarte.bank_account.domain.model.Transfer;
 import com.duarte.bank_account.repositories.AccountRepository;
+import com.duarte.bank_account.repositories.TransferRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final TokenService tokenService;
+    private final TransferRepository transferRepository;
 
     @Transactional
     public void deposit(Integer accountNumber, BigDecimal amount, String token){
@@ -80,12 +83,22 @@ public class AccountService {
             throw new IllegalArgumentException("Insufficient balance");
         }
 
-        //Transfer
+        //Save the transfer between accounts
         fromAccount.setBalance(fromAccount.getBalance().subtract(amount));
         toAccount.setBalance(toAccount.getBalance().add(amount));
 
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
+
+        //Save the transfer
+        Transfer transfer = Transfer.builder()
+                .fromAccount(fromAccount)
+                .toAccount(toAccount)
+                .amount(amount)
+                .transferDateTime(generateCreationDate())
+                .build();
+
+        transferRepository.save(transfer);
     }
 
 

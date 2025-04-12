@@ -12,9 +12,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -100,7 +98,6 @@ public class AccountService {
 
         transferRepository.save(transfer);
     }
-
 
     public Integer generateAccountNumber(){
         Random random = new Random();

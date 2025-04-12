@@ -44,6 +44,5 @@ public class AccountController {
         } catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
     }
 }

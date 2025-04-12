@@ -43,9 +43,6 @@ public class AuthService {
         String token = this.tokenService.generateToken(newAccount);
 
         return new AccountResponseDTO(
-                newAccount.getFullName(),
-                newAccount.getEmail(),
-                newAccount.getCreationDate(),
                 newAccount.getAccountNumber(),
                 newAccount.getBalance(),
                 token

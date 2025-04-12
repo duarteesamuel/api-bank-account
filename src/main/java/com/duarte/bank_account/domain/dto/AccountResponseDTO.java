@@ -4,9 +4,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 public record AccountResponseDTO(
-        String fullName,
-        String email,
-        Instant creationDate,
         Integer accountNumber,
         BigDecimal balance,
         String token

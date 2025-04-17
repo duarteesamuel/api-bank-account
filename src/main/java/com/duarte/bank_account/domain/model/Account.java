@@ -52,12 +52,4 @@ public class Account {
     @Column(nullable = false)
     private BigDecimal balance;
 
-    @OneToMany(mappedBy = "fromAccount", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<Transfer> sentTransfers = new ArrayList<>();
-
-    @OneToMany(mappedBy = "toAccount", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<Transfer> receivedTransfers = new ArrayList<>();
-
 }

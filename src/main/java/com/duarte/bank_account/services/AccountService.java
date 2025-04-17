@@ -78,7 +78,6 @@ public class AccountService {
         fromAccount.setBalance(fromAccount.getBalance().subtract(amount));
         toAccount.setBalance(toAccount.getBalance().add(amount));
 
-        //Create transfer to SENT
         Transfer transfer = Transfer.builder()
                 .fromAccount(fromAccount)
                 .toAccount(toAccount)

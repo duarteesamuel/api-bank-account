@@ -1,6 +1,5 @@
 package com.duarte.bank_account.controllers;
 
-import com.duarte.bank_account.domain.model.Transfer;
 import com.duarte.bank_account.services.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -8,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/account")
@@ -39,6 +37,18 @@ public class AccountController {
         try{
             accountService.transfer(fromAccountNumber, toAccountNumber, amount, fromToken);
             return ResponseEntity.status(HttpStatus.OK).body("Transfer successfully!");
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity<?> withdraw(@RequestParam(name = "accountNumber") Integer accountNumber,
+                                      @RequestParam(name = "amount") BigDecimal amount,
+                                      @RequestParam(name = "token") String token) {
+        try{
+            accountService.withdraw(accountNumber, amount, token);
+            return ResponseEntity.status(HttpStatus.OK).body("Withdraw successfully!");
         } catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }

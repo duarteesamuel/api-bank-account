@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/account/transfer").permitAll()
                         .requestMatchers(HttpMethod.GET, "/transfers").permitAll()
                         .requestMatchers(HttpMethod.GET, "/account").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/account/withdraw").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()
                 )

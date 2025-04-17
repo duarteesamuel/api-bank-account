@@ -89,6 +89,33 @@ public class AccountService {
         accountRepository.saveAll(Arrays.asList(fromAccount, toAccount));
     }
 
+    @Transactional
+    public void withdraw(Integer accountNumber, BigDecimal amount, String token){
+        //Validate the token of account
+        String accountEmail = tokenService.validateToken(token);
+        if(accountEmail == null){
+            throw new IllegalArgumentException("Invalid token for source account!");
+        }
+
+        //Verify if account number exists
+        Account findAccount = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Source account not found!"));
+
+        if (!findAccount.getEmail().matches(accountEmail)) {
+            throw new IllegalArgumentException("Token doesn't match source account!");
+        }
+
+        //Check if there is sufficient balance
+        if(findAccount.getBalance().compareTo(amount) < 0){
+            throw new IllegalArgumentException("Insufficient balance");
+        }
+
+        //Withdraw
+        findAccount.setBalance(findAccount.getBalance().subtract(amount));
+
+        accountRepository.save(findAccount);
+    }
+
     public List<AccountDTO> getAllAccounts(){
         List<Account> accounts = accountRepository.findAll();
 
@@ -101,9 +128,7 @@ public class AccountService {
                 account.getFullName(),
                 account.getBalance(),
                 account.getAccountNumber(),
-                account.getCreationDate(),
-                account.getSentTransfers(),
-                account.getReceivedTransfers()
+                account.getCreationDate()
         )).collect(Collectors.toList());
     }
 

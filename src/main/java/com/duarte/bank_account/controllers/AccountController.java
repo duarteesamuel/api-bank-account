@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/account")
@@ -33,15 +34,23 @@ public class AccountController {
     public ResponseEntity<?> transfer(@RequestParam(name = "fromAccountNumber") Integer fromAccountNumber,
                                       @RequestParam(name = "toAccountNumber") Integer toAccountNumber,
                                       @RequestParam(name = "amount") BigDecimal amount,
-                                      @RequestParam(name = "fromToken") String fromToken,
-                                      @RequestParam(name = "toToken") String toToken){
+                                      @RequestParam(name = "fromToken") String fromToken){
 
         try{
-            accountService.transfer(fromAccountNumber, toAccountNumber, amount, fromToken, toToken);
+            accountService.transfer(fromAccountNumber, toAccountNumber, amount, fromToken);
             return ResponseEntity.status(HttpStatus.OK).body("Transfer successfully!");
         } catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
+    @GetMapping
+    public ResponseEntity<?> getAllAccounts(){
+        try{
+            var response = accountService.getAllAccounts();
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (RuntimeException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

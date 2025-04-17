@@ -1,5 +1,6 @@
 package com.duarte.bank_account.services;
 
+import com.duarte.bank_account.domain.dto.AccountDTO;
 import com.duarte.bank_account.domain.model.Account;
 import com.duarte.bank_account.domain.model.Transfer;
 import com.duarte.bank_account.repositories.AccountRepository;
@@ -13,6 +14,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +51,7 @@ public class AccountService {
     }
 
     @Transactional
-    public void transfer(Integer fromAccountNumber, Integer toAccountNumber, BigDecimal amount, String fromToken, String toToken){
+    public void transfer(Integer fromAccountNumber, Integer toAccountNumber, BigDecimal amount, String fromToken){
         //Validate the token of fromAccount
         String fromAccountEmail = tokenService.validateToken(fromToken);
         if(fromAccountEmail == null){
@@ -63,32 +65,20 @@ public class AccountService {
             throw new IllegalArgumentException("Token doesn't match source account!");
         }
 
-        //Validate the token of toAccount
-        String toAccountEmail = tokenService.validateToken(toToken);
-        if(toAccountEmail == null){
-            throw new IllegalArgumentException("Invalid token for destination");
-        }
-
+        //Check if received account number exists
         Account toAccount = accountRepository.findByAccountNumber(toAccountNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Destination account not found!"));
-
-        if(!toAccount.getEmail().matches(toAccountEmail)){
-            throw new IllegalArgumentException("Token doesn't match destination account!");
-        }
 
         //Check if there is sufficient balance
         if(fromAccount.getBalance().compareTo(amount) < 0){
             throw new IllegalArgumentException("Insufficient balance");
         }
 
-        //Save the transfer between accounts
+        //Update balance
         fromAccount.setBalance(fromAccount.getBalance().subtract(amount));
         toAccount.setBalance(toAccount.getBalance().add(amount));
 
-        accountRepository.save(fromAccount);
-        accountRepository.save(toAccount);
-
-        //Save the transfer
+        //Create transfer to SENT
         Transfer transfer = Transfer.builder()
                 .fromAccount(fromAccount)
                 .toAccount(toAccount)
@@ -97,6 +87,25 @@ public class AccountService {
                 .build();
 
         transferRepository.save(transfer);
+        accountRepository.saveAll(Arrays.asList(fromAccount, toAccount));
+    }
+
+    public List<AccountDTO> getAllAccounts(){
+        List<Account> accounts = accountRepository.findAll();
+
+        if(accounts.isEmpty()){
+            throw new RuntimeException("No accounts registered in the system.");
+        }
+
+        return accounts.stream().map(account -> new AccountDTO(
+                account.getId(),
+                account.getFullName(),
+                account.getBalance(),
+                account.getAccountNumber(),
+                account.getCreationDate(),
+                account.getSentTransfers(),
+                account.getReceivedTransfers()
+        )).collect(Collectors.toList());
     }
 
     public Integer generateAccountNumber(){

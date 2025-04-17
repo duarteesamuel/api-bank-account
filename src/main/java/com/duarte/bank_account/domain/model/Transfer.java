@@ -1,5 +1,6 @@
 package com.duarte.bank_account.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,10 +22,12 @@ public class Transfer {
 
     @ManyToOne
     @JoinColumn(name = "from_account_id", nullable = false)
+    @JsonBackReference
     private Account fromAccount;
 
     @ManyToOne
     @JoinColumn(name = "to_account_id", nullable = false)
+    @JsonBackReference
     private Account toAccount;
 
     @Column(nullable = false)
